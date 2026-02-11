@@ -18,18 +18,7 @@ class AuthManager {
         }
     }
 
-    suspend fun register(email: String, password: String): Result<FirebaseUser> {
-        return try {
-            val result = auth.createUserWithEmailAndPassword(email, password).await()
-            Result.success(result.user!!)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
     fun logout() {
         auth.signOut()
     }
-
-    fun isUserLoggedIn(): Boolean = auth.currentUser != null
 }
