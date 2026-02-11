@@ -21,31 +21,8 @@ class AuthViewModel : ViewModel() {
                     val errorMsg = when {
                         e.message?.contains("password") == true -> "Contraseña incorrecta"
                         e.message?.contains("user") == true -> "Usuario no encontrado"
-                        e.message?.contains("network") == true -> "Error de conexión"
+                        e.message?.contains("network") == true -> "Error de conexion"
                         else -> "Error al iniciar sesión: ${e.message}"
-                    }
-                    onResult(false, errorMsg)
-                }
-            )
-        }
-    }
-
-    fun register(
-        email: String,
-        password: String,
-        onResult: (success: Boolean, error: String?) -> Unit
-    ) {
-        viewModelScope.launch {
-            val result = authManager.register(email, password)
-            result.fold(
-                onSuccess = { onResult(true, null) },
-                onFailure = { e ->
-                    val errorMsg = when {
-                        e.message?.contains("already in use") == true -> "Este email ya está registrado"
-                        e.message?.contains("invalid email") == true -> "Email inválido"
-                        e.message?.contains("weak password") == true -> "Contraseña muy débil"
-                        e.message?.contains("network") == true -> "Error de conexión"
-                        else -> "Error al registrarse: ${e.message}"
                     }
                     onResult(false, errorMsg)
                 }

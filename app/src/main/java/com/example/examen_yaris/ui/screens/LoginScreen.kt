@@ -132,7 +132,7 @@ fun LoginScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             enabled = !isLoading
         )
-
+        
         Button(
             onClick = {
                 if (email.isBlank() || password.isBlank()) {
@@ -155,7 +155,7 @@ fun LoginScreen(
                 .height(56.dp),
             shape = RoundedCornerShape(28.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF5B7BA6)
+                containerColor = Color(0xFF4CAF50) // Verde Unicaja
             ),
             enabled = !isLoading
         ) {
@@ -166,7 +166,7 @@ fun LoginScreen(
                 )
             } else {
                 Text(
-                    text = "Login",
+                    text = "Iniciar Sesión",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
