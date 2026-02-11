@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -92,6 +93,9 @@ fun MainScreen(
                     onClick = {
                         selectedPlayer = player
                         showDetailDialog = true
+                    },
+                    onDelete = {
+                        playerViewModel.deletePlayer(player)
                     }
                 )
             }
@@ -103,5 +107,264 @@ fun MainScreen(
             playerViewModel = playerViewModel,
             onDismiss = { showAddDialog = false }
         )
+    }
+
+    if (showDetailDialog && selectedPlayer != null) {
+        PlayerDetailDialog(
+            player = selectedPlayer!!,
+            onDismiss = {
+                showDetailDialog = false
+                selectedPlayer = null
+            }
+        )
+    }
+}
+
+@Composable
+fun PlayerCard(
+    player: Player,
+    onClick: () -> Unit,
+    onDelete: () -> Unit
+) {
+    Card( modifier = Modifier
+        .fillMaxWidth()
+        .padding(bottom = 12.dp)
+        .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors( containerColor = Color(0xFFF2FCEE) ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                model = player.imagen.ifEmpty { "https://via.placeholder.com/80" },
+                contentDescription = player.nombre,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .border(2.dp, Color(0xFF4CAF50), CircleShape),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = player.nombre,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Text(
+                    text = player.posicion,
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                Text(
+                    text = player.nacionalidad,
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .background(Color(0xFF4CAF50), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = player.numero.toString(),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            IconButton(onClick = onDelete) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Eliminar jugador",
+                    tint = Color.Red
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun AddPlayerDialog(
+    playerViewModel: PlayerViewModel,
+    onDismiss: () -> Unit
+) {
+    var nombre by remember { mutableStateOf("") }
+    var numero by remember { mutableStateOf("") }
+    var nacionalidad by remember { mutableStateOf("") }
+    var posicion by remember { mutableStateOf("") }
+    var imagen by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Agregar Jugador",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cerrar"
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                errorMessage?.let {
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = {
+                        nombre = it
+                        errorMessage = null
+                    },
+                    label = { Text("Nombre") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
+                    shape = RoundedCornerShape(8.dp)
+                )
+
+                OutlinedTextField(
+                    value = numero,
+                    onValueChange = {
+                        numero = it.filter { char -> char.isDigit() }
+                        errorMessage = null
+                    },
+                    label = { Text("Número") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
+                    shape = RoundedCornerShape(8.dp)
+                )
+
+                OutlinedTextField(
+                    value = nacionalidad,
+                    onValueChange = {
+                        nacionalidad = it
+                        errorMessage = null
+                    },
+                    label = { Text("Nacionalidad") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
+                    shape = RoundedCornerShape(8.dp)
+                )
+
+                OutlinedTextField(
+                    value = posicion,
+                    onValueChange = {
+                        posicion = it
+                        errorMessage = null
+                    },
+                    label = { Text("Posición") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
+                    shape = RoundedCornerShape(8.dp)
+                )
+
+                OutlinedTextField(
+                    value = imagen,
+                    onValueChange = {
+                        imagen = it
+                        errorMessage = null
+                    },
+                    label = { Text("URL Imagen") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    shape = RoundedCornerShape(8.dp)
+                )
+
+                Button(
+                    onClick = {
+                        when {
+                            nombre.isBlank() -> errorMessage = "El nombre es obligatorio"
+                            numero.isBlank() -> errorMessage = "El numero es obligatorio"
+                            nacionalidad.isBlank() -> errorMessage = "La nacionalidad es obligatoria"
+                            posicion.isBlank() -> errorMessage = "La posicion es obligatoria"
+                            else -> {
+                                val player = Player(
+                                    nombre = nombre,
+                                    numero = numero.toIntOrNull() ?: 0,
+                                    nacionalidad = nacionalidad,
+                                    posicion = posicion,
+                                    imagen = imagen
+                                )
+                                playerViewModel.addPlayer(player) { success, error ->
+                                    if (success) {
+                                        onDismiss()
+                                    } else {
+                                        errorMessage = error ?: "Error al agregar jugador"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(25.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF4CAF50)
+                    )
+                ) {
+                    Text(
+                        text = "Agregar Jugador",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+            }
+        }
     }
 }

@@ -72,31 +72,10 @@ class PlayerViewModel : ViewModel() {
         }
     }
 
-    fun updatePlayer(playerId: String, player: Player, onResult: (Boolean, String?) -> Unit) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                val playerData = hashMapOf(
-                    "nombre" to player.nombre,
-                    "numero" to player.numero,
-                    "nacionalidad" to player.nacionalidad,
-                    "posicion" to player.posicion,
-                    "imagen" to player.imagen
-                )
-                jugadoresCollection.document(playerId).set(playerData).await()
-                _isLoading.value = false
-                onResult(true, null)
-            } catch (e: Exception) {
-                _isLoading.value = false
-                onResult(false, e.message)
-            }
-        }
-    }
-
-    fun deletePlayer(playerId: String) {
+    fun deletePlayer(player: Player) {
         viewModelScope.launch {
             try {
-                jugadoresCollection.document(playerId).delete().await()
+                jugadoresCollection.document(player.id).delete().await()
             } catch (e: Exception) {
                 e.printStackTrace()
             }

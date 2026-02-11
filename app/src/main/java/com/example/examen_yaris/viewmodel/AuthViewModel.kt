@@ -33,8 +33,4 @@ class AuthViewModel : ViewModel() {
     fun logout() {
         authManager.logout()
     }
-
-    fun isUserLoggedIn(): Boolean = authManager.isUserLoggedIn()
-
-    fun getCurrentUserEmail(): String? = authManager.getCurrentUser()?.email
 }
